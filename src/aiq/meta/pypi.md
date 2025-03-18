@@ -42,130 +42,42 @@ With AgentIQ, you can move quickly, experiment freely, and ensure reliability ac
  * [Examples](https://github.com/NVIDIA/AgentIQ/tree/main/examples#readme): Explore examples of AgentIQ workflows.
  * [Create and Customize AgentIQ Workflows](https://docs.nvidia.com/agentiq/latest/guides/create_customize_workflows.html): Learn how to create and customize AgentIQ workflows.
  * [Evaluate with AgentIQ](https://docs.nvidia.com/agentiq/latest/guides/evaluate.html): Learn how to evaluate your AgentIQ workflows.
- * [Troubleshooting](https://docs.nvidia.com/agentiq/latest/troubleshooting.html): Get help with common issues.
+ * [Troubleshooting](https://docs.nvidia.com/agentiq/latest/troubleshooting.html): Get help with troubleshooting common issues.
 
 
 ## Get Started
 
-### Prerequisites
+1. Ensure you have Python 3.12, and a Python development environment.
 
-Before you begin using AgentIQ, ensure that you meet the following software prerequisites.
+   Assuming Python 3.12 is installed, create a virtual environment and activate it with:
+   ```bash
+   python -m venv env
+   source env/bin/activate
+   ```
 
-- Install [Git](https://git-scm.com/)
-- Install [Git Large File Storage](https://git-lfs.github.com/) (LFS)
-- Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Install AgentIQ with support for your desired LLM framework
 
-### Install From Source
+   ```bash
+   pip install agentiq[<your framework>]
+   ```
 
-1. Clone the AgentIQ repository to your local machine.
-    ```bash
-    git clone git@github.com:NVIDIA/AgentIQ.git agentiq
-    cd agentiq
-    ```
+   For example, to install AgentIQ with support for the LangChain framework (which is necessary for the Hello World example), use the following command:
 
-2. Initialize, fetch, and update submodules in the Git repository.
-    ```bash
-    git submodule update --init --recursive
-    ```
+   ```bash
+   pip install agentiq[langchain]
+   ```
 
-3. Fetch the data sets by downloading the LFS files.
-    ```bash
-    git lfs install
-    git lfs fetch
-    git lfs pull
-    ```
-
-4. Create a Python environment.
-    ```bash
-    uv venv --seed .venv
-    source .venv/bin/activate
-    ```
-
-5. Install the AgentIQ library.
-    To install the AgentIQ library along with all of the optional dependencies. Including developer tools (`--all-groups`) and all of the dependencies needed for profiling and plugins (`--all-extras`) in the source repository, run the following:
-    ```bash
-    uv sync --all-groups --all-extras
-    ```
-
-    Alternatively to install just the core AgentIQ without any plugins, run the following:
-    ```bash
-    uv sync
-    ```
-
-    At this point individual plugins, which are located under the `packages` directory, can be installed with the following command `uv pip install -e '.[<plugin_name>]'`.
-    For example, to install the `langchain` plugin, run the following:
-    ```bash
-    uv pip install -e '.[langchain]'
-    ```
-
-    > [!NOTE]
-    > Many of the example workflows require plugins, and following the documented steps in one of these examples will in turn install the necessary plugins. For example following the steps in the `examples/simple/README.md` guide will install the `agentiq-langchain` plugin if you haven't already done so.
+   > [!NOTE]
+   > AgentIQ also supports other LLM frameworks. Refer to the [plugin guide](https://docs.nvidia.com/agentiq/latest/concepts/plugins.md) for more information.
 
 
-    In addition to plugins, there are optional dependencies needed for profiling. To install these dependencies, run the following:
-    ```bash
-    uv pip install -e .[profiling]
-    ```
-
-6. Verify the installation using the AgentIQ CLI
+3. Verify the installation using the AgentIQ CLI
 
    ```bash
    aiq --version
    ```
 
    This should output the AgentIQ version which is currently installed.
-
-## Hello World Example
-
-1. Ensure you have set the `NVIDIA_API_KEY` environment variable to allow the example to use NVIDIA NIMs. An API key can be obtained by visiting [`build.nvidia.com`](https://build.nvidia.com/) and creating an account.
-
-   ```bash
-   export NVIDIA_API_KEY=<your_api_key>
-   ```
-
-2. Create the AgentIQ workflow configuration file. This file will define the agents, tools, and workflows that will be used in the example. Save the following as `workflow.yaml`:
-
-   ```yaml
-   functions:
-      # Add a tool to search wikipedia
-      wikipedia_search:
-         _type: wiki_search
-         max_results: 2
-
-   llms:
-      # Tell AgentIQ which LLM to use for the agent
-      nim_llm:
-         _type: nim
-         model_name: meta/llama-3.1-70b-instruct
-         temperature: 0.0
-
-   workflow:
-      # Use an agent that 'reasons' and 'acts'
-      _type: react_agent
-      # Give it access to our wikipedia search tool
-      tool_names: [wikipedia_search]
-      # Tell it which LLM to use
-      llm_name: nim_llm
-      # Make it verbose
-      verbose: true
-      # Retry parsing errors because LLMs are non-deterministic
-      retry_parsing_errors: true
-      # Retry up to 3 times
-      max_retries: 3
-   ```
-
-3. Run the Hello World example using the `aiq` CLI and the `workflow.yaml` file.
-
-   ```bash
-   aiq run --config_file workflow.yaml --input "List five subspecies of Aardvarks"
-   ```
-
-   This will run the workflow and output the results to the console.
-
-   ```console
-   Workflow Result:
-   ['Here are five subspecies of Aardvarks:\n\n1. Orycteropus afer afer (Southern aardvark)\n2. O. a. adametzi  Grote, 1921 (Western aardvark)\n3. O. a. aethiopicus  Sundevall, 1843\n4. O. a. angolensis  Zukowsky & Haltenorth, 1957\n5. O. a. erikssoni  Lönnberg, 1906']
-   ```
 
 ## Feedback
 

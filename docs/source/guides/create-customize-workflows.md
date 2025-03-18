@@ -272,10 +272,6 @@ Adding individual web pages to a workflow can be cumbersome, especially when dea
 
 The `tavily_internet_search` tool is part of the `agentiq[langchain]` package, to install the package run:
 ```bash
-pip install agentiq[langchain]
-```
-Alternatively, to install the `agentiq[langchain]` package from source run:
-```bash
 # local package install from source
 uv pip install -e '.[langchain]'
 ```
@@ -511,11 +507,11 @@ The `pyproject.toml` file defines your package metadata and dependencies. In thi
   aiq --version
   ```
 
- Use the first two digits of the version number. For example if the version is `0.1.0` then the dependency would be `agentiq[langchain]~=0.1`.
+ Use the first two digits of the version number. For example if the version is `1.0.0` then the dependency would be `agentiq[langchain]~=1.0`.
 
   ```toml
   dependencies = [
-    "agentiq[langchain]~=0.1",
+    "agentiq[langchain]~=1.0",
     # Add any additional dependencies your workflow needs
   ]
   ```
