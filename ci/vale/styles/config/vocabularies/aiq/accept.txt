@@ -47,6 +47,7 @@ DB(s?)
 [Ee]ngineerable
 [Ee]val
 [Ee]xplainability
+Faiss
 [Gg]eneratable
 glog
 GPU(s?)
@@ -101,6 +102,7 @@ pytest
 [Ss]ubclassing
 [Ss]ubcard(s?)
 [Ss]ubgraph(s?)
+[Ss]ubpackage(s?)
 [Ss]ubword(s?)
 [Ss]uperset(s?)
 Tavily

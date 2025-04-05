@@ -15,11 +15,12 @@
 
 import asyncio
 import logging
+import shutil
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel
-from tqdm.asyncio import tqdm
+from tqdm import tqdm
 
 from aiq.data_models.evaluate import EvalConfig
 from aiq.eval.config import EvaluationRunConfig
@@ -28,6 +29,7 @@ from aiq.eval.dataset_handler.dataset_handler import DatasetHandler
 from aiq.eval.evaluator.evaluator_model import EvalInput
 from aiq.eval.evaluator.evaluator_model import EvalInputItem
 from aiq.eval.evaluator.evaluator_model import EvalOutput
+from aiq.eval.utils.output_uploader import OutputUploader
 from aiq.runtime.session import AIQSessionManager
 
 logger = logging.getLogger(__name__)
@@ -123,6 +125,10 @@ class EvaluationRun:  # pylint: disable=too-many-public-methods
                 item.output_obj = output
                 item.trajectory = self.intermediate_step_adapter.validate_intermediate_steps(intermediate_steps)
 
+        async def wrapped_run(item: EvalInputItem) -> None:
+            await run_one(item)
+            pbar.update(1)
+
         # if self.config.skip_complete is set skip eval_input_items with a non-empty output_obj
         if self.config.skip_completed_entries:
             eval_input_items = [item for item in self.eval_input.eval_input_items if not item.output_obj]
@@ -131,7 +137,9 @@ class EvaluationRun:  # pylint: disable=too-many-public-methods
                 return
         else:
             eval_input_items = self.eval_input.eval_input_items
-        await tqdm.gather(*[run_one(item) for item in eval_input_items])
+        pbar = tqdm(total=len(eval_input_items), desc="Running workflow")
+        await asyncio.gather(*[wrapped_run(item) for item in eval_input_items])
+        pbar.close()
 
     async def run_workflow(self, session_manager: AIQSessionManager):
         if self.config.endpoint:
@@ -158,6 +166,12 @@ class EvaluationRun:  # pylint: disable=too-many-public-methods
         profiler_runner = ProfilerRunner(self.eval_config.general.profiler, self.eval_config.general.output_dir)
 
         await profiler_runner.run(all_stats)
+
+    def cleanup_output_directory(self):
+        '''Remove contents of the output directory if it exists'''
+        if self.eval_config.general.output and self.eval_config.general.output.dir and \
+                self.eval_config.general.output.dir.exists():
+            shutil.rmtree(self.eval_config.general.output.dir)
 
     def write_output(self, dataset_handler: DatasetHandler):
         workflow_output_file = self.eval_config.general.output_dir / "workflow_output.json"
@@ -225,6 +239,9 @@ class EvaluationRun:  # pylint: disable=too-many-public-methods
         self.eval_config = config.eval
         logger.debug("Loaded evaluation configuration: %s", self.eval_config)
 
+        # Cleanup the output directory
+        if self.eval_config.general.output and self.eval_config.general.output.cleanup:
+            self.cleanup_output_directory()
         # Load the input dataset
         # For multiple datasets, one handler per dataset can be created
         dataset_config = self.eval_config.general.dataset  # Currently only one dataset is supported
@@ -263,6 +280,12 @@ class EvaluationRun:  # pylint: disable=too-many-public-methods
 
         # Write the results to the output directory
         self.write_output(dataset_handler)
+
+        # Run custom scripts and upload evaluation outputs to S3
+        if self.eval_config.general.output:
+            output_uploader = OutputUploader(self.eval_config.general.output)
+            output_uploader.run_custom_scripts()
+            await output_uploader.upload_directory()
 
         return EvaluationRunOutput(
             workflow_output_file=self.workflow_output_file,
