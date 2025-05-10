@@ -1,17 +1,16 @@
 # A Knowledge Agent 
 
-This is an agent that can handle a variety of questions. The agent is using a LLM with reasoning ability. You can find more information about the models at: https://build.nvidia.com/ 
+This is a versatile agent that utilizes a Large Language Model (LLM) with advanced reasoning capabilities to provide accurate and informative responses to a wide range of queries. The agent is equipped with four specialized tools:
 
-When a query comes, the agent can think, make a decision to use one or more of four tools (RAG, LLM, WebSearch, Wikipedia), analyse the answers, and generate a final answer.
+RAG (Retrieval-Augmented Generator): enabled by the NVIDIA RAG blueprint (https://github.com/NVIDIA-AI-Blueprints/rag), which allows for the upload of domain-specific PDF files, such as financial reports.
 
-The RAG server can be set up using NVIDIA RAG blueprint: https://github.com/NVIDIA-AI-Blueprints/rag
-You can upload PDF files to RAG for any specific domain, such as financial reports. Then the agent could call the RAG tool to answer your queries related to this domain. 
+LLM: handles general questions and provides insightful responses.
 
-For general questions, the agent could call the LLM tool.
+WebSearch: powered by Tavily, provides up-to-date information on news and date-related queries.
 
-For news or date related queries, the agent could call the Web Search tool using Tavily.
+Wikipedia: provides authoritative answers to questions on a vast range of topics.
 
-For wikipedia related questions, the agent could call the Wikipedia search tool.
+When a query is received, the agent uses its reasoning capabilities to select the most suitable tool(s), analyse the answers, and generate a final answer.
 
 
 ## How to run it
