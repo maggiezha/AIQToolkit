@@ -14,10 +14,30 @@ When a query is received, the agent uses its reasoning capabilities to select th
 
 You can find more information about the models used here, or try other models by visiting: https://build.nvidia.com/
 
+
 ## How to run it
-How to run it
 
+```bash
+uv pip install -e .
+```
 
+```bash
+aiq serve --config_file configs/config.yml --host 0.0.0.0 --port 8000
+```
+aiq serve --config_file configs/config.yml --host 0.0.0.0 --port 8000
+
+You can test with swagger endpoints at http://localhost:8000/docs
+
+Or send a query:
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/generate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{ "input_messages": "What is NVIDIA's revenue in the year 2025?"
+}'
+```
 
 
 
