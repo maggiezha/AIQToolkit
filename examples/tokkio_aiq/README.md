@@ -12,6 +12,7 @@ Wikipedia: provides authoritative answers to questions on a vast range of topics
 
 When a query is received, the agent uses its reasoning capabilities to select the most suitable tool(s), analyse the answers, and generate a final answer.
 
+You can find more information about the models used here, or try other models by visiting: https://build.nvidia.com/
 
 ## How to run it
 How to run it
