@@ -24,7 +24,7 @@ uv pip install -e .
 ```bash
 aiq serve --config_file configs/config.yml --host 0.0.0.0 --port 8000
 ```
-aiq serve --config_file configs/config.yml --host 0.0.0.0 --port 8000
+
 
 You can test with swagger endpoints at http://localhost:8000/docs
 
